@@ -27,6 +27,66 @@ class TransactionBuilder
         $this->tron = $tron;
     }
 
+    public function unDelegateResource(string $receiver, string $resource, int $amount, string $from = null): array
+    {
+        if (is_null($from)) {
+
+            $from = $this->tron->address['hex'];
+        }
+
+        $receiver = $this->tron->address2HexString($receiver);
+        $from     = $this->tron->address2HexString($from);
+
+        if ($from === $receiver) {
+
+            throw new TronException('Cannot transfer TRX to the same account');
+        }
+
+        $options = [
+            'owner_address'    => $from,
+            'resource'         => $resource,
+            'receiver_address' => $receiver,
+            'balance'          => $this->tron->toTron($amount),
+        ];
+
+        return $this->tron->getManager()->request('wallet/undelegateresource', $options);
+    }
+
+    /**
+     * @param string $to
+     * @param string $resource
+     * @param int $amount
+     * @param string|null $from
+     * @param bool $lock
+     * @return array
+     * @throws TronException
+     */
+    public function delegateResource(string $to, string $resource, int $amount, string $from = null, bool $lock = false): array
+    {
+        if (is_null($from)) {
+
+            $from = $this->tron->address['hex'];
+        }
+
+        $to   = $this->tron->address2HexString($to);
+        $from = $this->tron->address2HexString($from);
+
+        if ($from === $to) {
+
+            throw new TronException('Cannot transfer TRX to the same account');
+        }
+
+        $options = [
+            'owner_address'    => $from,
+            'resource'         => $resource,
+            'receiver_address' => $to,
+            'balance'          => $this->tron->toTron($amount),
+            'lock'             => $lock,
+        ];
+
+        return $this->tron->getManager()->request('wallet/delegateresource', $options);
+    }
+
     /**
      * Creates a transaction of transfer.
      * If the recipient address does not exist, a corresponding account will be created on the blockchain.

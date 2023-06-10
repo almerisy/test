@@ -831,6 +831,43 @@ class Tron implements TronInterface
     }
 
     /**
+     * @param string $receiver
+     * @param string $resource
+     * @param int $amount
+     * @param string|null $from
+     * @return array
+     * @throws TronException
+     */
+    public function unDelegateResource(string $receiver, string $resource, int $amount, string $from = null): array
+    {
+        $builder  = $this->getTransactionBuilder();
+        $trans    = $builder->unDelegateResource($receiver, $resource, $amount, $from);
+        $singed   = $this->signTransaction($trans);
+        $response = $this->sendRawTransaction($singed);
+
+        return array_merge($response, $singed);
+    }
+
+    /**
+     * @param string $to
+     * @param string $resource
+     * @param int $amount
+     * @param string|null $from
+     * @param bool $lock
+     * @return array
+     * @throws TronException
+     */
+    public function delegateResource(string $to, string $resource, int $amount, bool $lock = false, string $from = null): array
+    {
+        $builder  = $this->getTransactionBuilder();
+        $trans    = $builder->delegateResource($to, $resource, $amount, $from, $lock);
+        $singed   = $this->signTransaction($trans);
+        $response = $this->sendRawTransaction($singed);
+
+        return array_merge($response, $singed);
+    }
+
+    /**
      * Creating a new token based on Tron
      *
      * @param array token {
