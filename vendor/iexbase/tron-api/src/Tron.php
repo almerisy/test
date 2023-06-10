@@ -830,6 +830,19 @@ class Tron implements TronInterface
         return $this->sendTransaction(...$args);
     }
 
+    public function getAccountResource($address = null, bool $visible = false): array
+    {
+        if (is_null($address)) {
+
+            $address = $this->address['hex'];
+        }
+
+        $address = $this->address2HexString($address);
+        $options = ['address' => $address, 'visible' => $visible];
+
+        return $this->getManager()->request('wallet/getaccountresource', $options);
+    }
+
     /**
      * @param string $receiver
      * @param string $resource
